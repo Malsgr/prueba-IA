@@ -1,5 +1,9 @@
 import random
+import os
 from collections import deque
+
+if os.name == 'nt':
+    import winsound
 from rich.console import Console
 from rich.style import Style
 from rich.text import Text
@@ -257,13 +261,26 @@ class Game:
         cell = self.grid[self.player_y][self.player_x]
         count = cell.count_adjacent_mines(self)
         
-        notes = ['Do', 'Re', 'Mi', 'Fa', 'Sol']
-        if count >= 5:
-            note = 'Sol (5+)'
-        else:
-            note = notes[count]
+        notes = {
+            0: ('Do', 262),
+            1: ('Re', 294),
+            2: ('Mi', 330),
+            3: ('Fa', 349),
+            4: ('Sol', 392),
+        }
         
-        self.message = f"Radar: {count} mina(s) cerca - Nota: {note}"
+        if count >= 5:
+            note_name, frequency = ('Sol+', 523)
+        else:
+            note_name, frequency = notes[count]
+        
+        if os.name == 'nt':
+            try:
+                winsound.Beep(frequency, 300)
+            except:
+                pass
+        
+        self.message = f"Nota: {note_name}"
         return count
 
     def reveal_all_mines(self):
@@ -299,13 +316,17 @@ class Game:
         if cell.mine_deactivated:
             return "✓", "green"
         
-        if not cell.is_visible:
-            return "░", "bright_black"
+        if cell.is_discovered:
+            if cell.is_safe:
+                return " ", "white"
+            elif cell.is_orange:
+                return "▒", "yellow"
         
-        if cell.is_safe:
-            return " ", "white"
-        elif cell.is_orange:
-            return "▒", "yellow"
+        if cell.is_visible:
+            if cell.is_safe:
+                return " ", "white"
+            elif cell.is_orange:
+                return "▒", "yellow"
         
         return "░", "bright_black"
 

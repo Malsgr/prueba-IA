@@ -110,14 +110,13 @@
         }
 
         .cell.fog {
-            background: #1a1a2e;
-            color: #333;
+            background: #1a3a5c;
+            color: #1a3a5c;
         }
 
-        .cell.adjacent-1 { color: #00ff00; }
-        .cell.adjacent-2 { color: #ffff00; }
-        .cell.adjacent-3 { color: #ff8c00; }
-        .cell.adjacent-4 { color: #ff0040; }
+        .cell.discovered {
+            background: #ffffff;
+        }
 
         #message {
             position: fixed;
@@ -260,7 +259,6 @@
     </div>
     
     <div id="radar-panel">
-        <div id="radar-count"></div>
         <div class="note" id="radar-note"></div>
     </div>
 
@@ -425,7 +423,7 @@
             visited.add(`${CENTER},${CENTER}`);
             game.grid[CENTER][CENTER].isSafe = true;
 
-            const targetSize = Math.floor(TOTAL_CELLS * (0.35 + Math.random() * 0.1));
+            const targetSize = Math.floor(TOTAL_CELLS * (0.08 + Math.random() * 0.04));
             const queue = [[CENTER, CENTER]];
 
             while (visited.size < targetSize) {
@@ -662,18 +660,21 @@
             const cell = game.grid[game.playerY][game.playerX];
             const count = cell.countAdjacentMines();
             
-            playSound('radar');
-            
-            const notes = ['Do', 'Re', 'Mi', 'Fa', 'Sol'];
-            const note = count >= 5 ? 'Sol (5+)' : notes[count];
-            
-            document.getElementById('radar-count').textContent = `Minas cerca: ${count}`;
-            document.getElementById('radar-note').textContent = `Nota: ${note}`;
-            document.getElementById('radar-panel').classList.add('show');
-            
-            setTimeout(() => {
-                document.getElementById('radar-panel').classList.remove('show');
-            }, 1500);
+            if (game.soundEnabled) {
+                for (let i = 0; i < count; i++) {
+                    setTimeout(() => {
+                        const oscillator = audioContext.createOscillator();
+                        const gainNode = audioContext.createGain();
+                        oscillator.connect(gainNode);
+                        gainNode.connect(audioContext.destination);
+                        oscillator.frequency.setValueAtTime(440, audioContext.currentTime);
+                        gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+                        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.15);
+                        oscillator.start(audioContext.currentTime);
+                        oscillator.stop(audioContext.currentTime + 0.15);
+                    }, i * 200);
+                }
+            }
             
             return count;
         }
@@ -718,11 +719,19 @@
                     } else if (cell.mineDeactivated) {
                         cellDiv.classList.add('deactivated');
                         cellDiv.textContent = '✓';
-                    } else if (!cell.isVisible) {
-                        cellDiv.classList.add('fog');
-                    } else if (cell.isSafe || cell.isOrange) {
-                        cellDiv.classList.add('safe');
+                    } else if (cell.isDiscovered) {
+                        cellDiv.classList.add('discovered');
                         cellDiv.textContent = ' ';
+                    } else if (cell.isVisible) {
+                        if (cell.isSafe) {
+                            cellDiv.classList.add('discovered');
+                            cellDiv.textContent = ' ';
+                        } else if (cell.isOrange) {
+                            cellDiv.classList.add('orange');
+                            cellDiv.textContent = '▒';
+                        } else {
+                            cellDiv.classList.add('fog');
+                        }
                     } else {
                         cellDiv.classList.add('fog');
                     }
