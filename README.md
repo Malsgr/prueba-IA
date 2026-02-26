@@ -13,7 +13,7 @@ El mapa será una cuadrícula, el tamaño base será de 33x33, pero podrá varia
 
 #### Gameplay
 
-El jugador se podrá mover por el mapa con las flechas del teclado. Las minas solo explotan si te mueves a su espacio y después fuera de él sin desactivarla. Para desactivar una mina, deberá moverse a su espacio y pulsar la tecla 'W', lo que evitará que explote al moverte fuera de el y mostrará ese cuadrado de color rojo.
+El jugador se podrá mover por el mapa con las flechas del teclado. Las minas solo explotan si te mueves a su espacio y después fuera de él sin desactivarla. Para desactivar una mina, deberá moverse a su espacio y pulsar la tecla 'W', lo que evitará que explote al moverte fuera de el y mostrará ese cuadrado de color rojo. El jugador ocupará un solo cuadrado, que se mostrará de color azul.
 
 De forma similar al buscaminas original, todo cuadrado sin ninguna mina en un area de 3x3 (alrededor suya) al que el jugador tenga acceso directo (moviendose solamente a traveś de otros cuadrados seguros), será llamado 'seguro', aparecerá de color blanco y se 'propagará' a los cuadros adyacentes, obligandolos a revelarse si tambien son 'seguros'. Los detalles de como operará esta mecánica los describiré más adelante, en el apartado "Como hacerlo". 
 
