@@ -19,11 +19,13 @@ De forma similar al buscaminas original, todo cuadrado sin ninguna mina en un ar
 
 Todo cuadrado que **si** tenga alguna mina adyacente (o cuadro naranja), serán los llamados "cuadros naranjas", también se mostraran blancos para el jugador, pero no obligarán a los cuadros blancos de alrededor a mostrarse.
 
-En lugar de que cada cuadrado contenga un número que indique cuantas minas hay adyacentes, el jugador podrá pulsar la tecla 'Q', que reproducirá un sonido cuyo tono varie según el número de minas alrededor. Un tono bajo si solo hay una y uno ligeramente más alto (pero claramente distinguible) si hay dos, y otro más alto si hay tres y etc etc.
+En lugar de que cada cuadrado contenga un número que indique cuantas minas hay adyacentes, el jugador podrá pulsar la tecla 'Q', que reproducirá un sonido cuyo tono varie según el número de minas alrededor. Do si solo hay una mina, Re si hay dos, Mi si hay tres y así hasta Sol para cinco o más minas.
 
 Para una capa extra de dificultad, el jugador solo podrá ver los cuadros blancos y minas descubiertas en un area de 11x11 a su alrededor (que se moverá con el jugador), todos los demás cuadrados se mostrarán grises claro.
 
 Finalmente, el jugador tendrá libertad para moverse por todo el mapa en todo momento, pero no revelará los cuadros blancos no descubiertos si se encuentra con ellos de casualidad. Y por supuesto, pasar por encima de una mina sin desactivarla revelará todas las minas restantes y terminará el juego.
+
+El juego acaba cuando todas las minas hayan sido marcadas. El jugador puede marcar tantas casillas como minas haya, para que no pueda simplemente marcar todos los cuadrados.
 
 #### Como hacerlo
 
@@ -41,4 +43,3 @@ Los cuadrados pueden ser 'activo', 'seguros', 'naranjas', o 'no descubiertos' y 
 
 Todas estas propiedades se comprueban para todos los cuadrados cada vez que un nuevo cuadrado obtiene la propiedad de seguro. Excepto la propiedad 'visible' que se actualiza cada vez que le jugador se mueve.
 
-También hay que hacer un cambio respecto al buscaminas original. Las minas no pueden aparecer adyacentes una de otras, es decir, que alrededor de toda mina hay un area de 3x3 en la que no puede haber una mina.
