@@ -9,7 +9,7 @@ En vez de una cuadrícula e ir marcando las minas con el ratón, el jugador tend
 
 ### Detalles
 #### Mapa
-El mapa será una cuadrícula, el tamaño base será de 33x33, pero podrá variar según la dificultad elegida. El número de minas se calculará multiplicando el número de cuadrados totales menos uno (1088) por 0.05, de forma que cada cuadrado tiene una probabilidad del 5% de contener una mina (54 minas para 1089 cuadrados). Las minas se colocarán aleatoriamente por todo el mapa al empezar la partida, con la única excepción del cuadrado central (porque será el punto de aparición del jugador). 
+El mapa será una cuadrícula, el tamaño base será de 33x33, pero podrá variar según la dificultad elegida. El número de minas se calculará multiplicando el número de cuadrados totales menos uno (1088) por 0.05, de forma que cada cuadrado tiene una probabilidad del 5% de contener una mina (54 minas para 1089 cuadrados). Las minas se colocan por el mapa al principio de la partida, los detalles en la generación se explican más adelante, pero nunca en la casilla central (ese será el punto de aparición del jugador). 
 
 #### Gameplay
 
