@@ -21,10 +21,24 @@ Todo cuadrado que **si** tenga alguna mina adyacente (o cuadro naranja), serán 
 
 En lugar de que cada cuadrado contenga un número que indique cuantas minas hay adyacentes, el jugador podrá pulsar la tecla 'Q', que reproducirá un sonido cuyo tono varie según el número de minas alrededor. Un tono bajo si solo hay una y uno ligeramente más alto (pero claramente distinguible) si hay dos, y otro más alto si hay tres y etc etc.
 
-Para una capa extra de dificultad, el jugador solo podrá ver los cuadros blancos y minas descubiertas en un area de 11x11 a su alrededor (que se moverá con el jugador), todos los demás cuadrados se mostrarán grises.
+Para una capa extra de dificultad, el jugador solo podrá ver los cuadros blancos y minas descubiertas en un area de 11x11 a su alrededor (que se moverá con el jugador), todos los demás cuadrados se mostrarán grises claro.
 
 Finalmente, el jugador tendrá libertad para moverse por todo el mapa en todo momento, pero no revelará los cuadros blancos no descubiertos si se encuentra con ellos de casualidad. Y por supuesto, pasar por encima de una mina sin desactivarla revelará todas las minas restantes y terminará el juego.
 
 #### Como hacerlo
 
-Los cuadrados pueden ser una mina o no, pueden ser 'seguros' o 'naranjas', pueden ser 'visibles' o no
+Los cuadrados pueden ser 'activo', 'seguros', 'naranjas', o 'no descubiertos' y pueden ser 'visibles' o no. Todas estás serán variables que tendrán cada uno de los cuadrados, esto es exactamente lo que significa cada una:
+
+- Activo: Si el cuadrado contiene una mina no desactivada por el jugador.
+
+- Seguro: No tienen ninguna mina ni cuadrado 'naranja' adyacente. Se muestra de color blanco para el jugador y obliga a otros cuadrados 'seguros' de alrededor a mostrarse. Cuando una mina es marcada por el jugador, su estado cambia a este.
+
+- Naranja: Son aquellos cuadrados que si tienen alguna mina o cuadrado 'naranja' adyacente. También se muestran blancos pero no obligan a los cuadrados de alrededor a mostrarse.
+
+- No descubierto: Son aquellos cuadrados que no han sido obligados a mostrarse por un cuadrado 'seguro' ni contiene una mina. Se muestran se color gris oscuro, al igual que las minas no marcadas.
+
+- Visibles: Todos los cuadrados son de color gris claro a menos que tengan esta propiedad. Esta propiedad la obtienen los cuadrados cuando el jugador se mueve de forma que los incluya en el area de 11x11 de la que hablamos antes.
+
+Todas estas propiedades se comprueban para todos los cuadrados cada vez que un nuevo cuadrado obtiene la propiedad de seguro. Excepto la propiedad 'visible' que se actualiza cada vez que le jugador se mueve.
+
+También hay que hacer un cambio respecto al buscaminas original. Las minas no pueden aparecer adyacentes una de otras, es decir, que alrededor de toda mina hay un area de 3x3 en la que no puede haber una mina.
