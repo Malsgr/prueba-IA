@@ -91,9 +91,14 @@
             color: #000;
         }
 
+        .cell.fog-dark {
+            background: #000000;
+            color: #000000;
+        }
+
         .cell.fog {
-            background: #1a3a5c;
-            color: #1a3a5c;
+            background: #333333;
+            color: #333333;
         }
 
         .cell.discovered {
@@ -360,11 +365,8 @@
                 this.y = y;
                 this.hasMine = false;
                 this.mineDeactivated = false;
-                this.isSafe = false;
-                this.isOrange = false;
-                this.isDiscovered = false;
+                this.isVisited = false;
                 this.isVisible = false;
-                this.foundByInitialSearch = false;
             }
 
             getNeighbors() {
@@ -384,12 +386,6 @@
 
             countAdjacentMines() {
                 return this.getNeighbors().filter(n => n.hasMine && !n.mineDeactivated).length;
-            }
-
-            hasAdjacentOrange() {
-                return this.getNeighbors().some(n => 
-                    n.isOrange || (n.hasMine && !n.mineDeactivated)
-                );
             }
         }
 
@@ -412,9 +408,8 @@
                 }
             }
 
-            createSafeRegion();
+            game.grid[CENTER][CENTER].isVisited = true;
             placeMines();
-            markCenterSafe();
             updateVisibility();
             renderGrid();
             updateInfo();
@@ -422,200 +417,34 @@
             hideRadar();
         }
 
-        function createSafeRegion() {
-            const visited = new Set();
-            visited.add(`${CENTER},${CENTER}`);
-            game.grid[CENTER][CENTER].isSafe = true;
-
-            const targetSize = Math.floor(TOTAL_CELLS * (0.05 + Math.random() * 0.03));
-            const queue = [[CENTER, CENTER]];
-
-            while (visited.size < targetSize) {
-                const candidates = [];
-                for (const [y, x] of queue) {
-                    for (const [dy, dx] of [[-1,0],[1,0],[0,-1],[0,1]]) {
-                        const ny = y + dy;
-                        const nx = x + dx;
-                        if (ny >= 0 && ny < MAP_SIZE && nx >= 0 && nx < MAP_SIZE && !visited.has(`${nx},${ny}`)) {
-                            candidates.push([ny, nx]);
-                        }
-                    }
-                }
-
-                if (!candidates.length) break;
-
-                const [ny, nx] = candidates[Math.floor(Math.random() * candidates.length)];
-                visited.add(`${nx},${ny}`);
-                game.grid[ny][nx].isSafe = true;
-                queue.push([ny, nx]);
+        function placeMines() {
+            let minesPlaced = 0;
+            
+            while (minesPlaced < TOTAL_MINES) {
+                const x = Math.floor(Math.random() * MAP_SIZE);
+                const y = Math.floor(Math.random() * MAP_SIZE);
+                
+                if (x === CENTER && y === CENTER) continue;
+                if (game.grid[y][x].hasMine) continue;
+                
+                game.grid[y][x].hasMine = true;
+                minesPlaced++;
             }
-        }
-
-        function getFrontier() {
-            const frontier = [];
-            for (let y = 0; y < MAP_SIZE; y++) {
-                for (let x = 0; x < MAP_SIZE; x++) {
-                    const cell = game.grid[y][x];
-                    if (cell.isSafe) continue;
-                    
-                    for (const [dy, dx] of [[-1,0],[1,0],[0,-1],[0,1]]) {
-                        const ny = y + dy;
-                        const nx = x + dx;
-                        if (ny >= 0 && ny < MAP_SIZE && nx >= 0 && nx < MAP_SIZE && game.grid[ny][nx].isSafe) {
-                            frontier.push(cell);
-                            break;
-                        }
-                    }
-                }
-            }
-            return frontier;
-        }
-
-        function bfsConnectedSafeCells(start) {
-            const visited = new Set();
-            const queue = [[start.x, start.y]];
-            visited.add(`${start.x},${start.y}`);
-
-            while (queue.length) {
-                const [cx, cy] = queue.shift();
-                for (const [dy, dx] of [[-1,0],[1,0],[0,-1],[0,1]]) {
-                    const nx = cx + dx;
-                    const ny = cy + dy;
-                    if (nx >= 0 && nx < MAP_SIZE && ny >= 0 && ny < MAP_SIZE) {
-                        const cell = game.grid[ny][nx];
-                        if (cell.isSafe && !visited.has(`${nx},${ny}`)) {
-                            visited.add(`${nx},${ny}`);
-                            queue.push([nx, ny]);
-                        }
-                    }
-                }
-            }
-            return visited;
         }
 
         function placeMines() {
             let minesPlaced = 0;
-            let attempts = 0;
-            const maxAttempts = 5000;
-
-            const safeCells = new Set();
-            for (let y = 0; y < MAP_SIZE; y++) {
-                for (let x = 0; x < MAP_SIZE; x++) {
-                    if (game.grid[y][x].isSafe) {
-                        safeCells.add(`${x},${y}`);
-                    }
-                }
-            }
-
-            while (minesPlaced < TOTAL_MINES && attempts < maxAttempts) {
-                attempts++;
-                
+            
+            while (minesPlaced < TOTAL_MINES) {
                 const x = Math.floor(Math.random() * MAP_SIZE);
                 const y = Math.floor(Math.random() * MAP_SIZE);
-                const cell = game.grid[y][x];
                 
-                if (cell.hasMine || cell.isSafe) continue;
+                if (x === CENTER && y === CENTER) continue;
+                if (game.grid[y][x].hasMine) continue;
                 
-                cell.hasMine = true;
+                game.grid[y][x].hasMine = true;
                 minesPlaced++;
             }
-            
-            updateSafeAndOrange();
-        }
-
-        function updateOrangeCells() {
-            for (let y = 0; y < MAP_SIZE; y++) {
-                for (let x = 0; x < MAP_SIZE; x++) {
-                    const cell = game.grid[y][x];
-                    if (cell.hasMine) continue;
-                    cell.isOrange = cell.hasAdjacentOrange();
-                }
-            }
-        }
-
-        function markCenterSafe() {
-            const centerCell = game.grid[CENTER][CENTER];
-            centerCell.isSafe = true;
-            centerCell.isDiscovered = true;
-            propagateFromCell(centerCell, { continueOnMine: true, markInitialSearch: true });
-        }
-
-        function getClockwiseNeighbors(x, y) {
-            const neighbors = [];
-            const directions = [
-                [-1, 0],   // top
-                [-1, -1],  // top-left
-                [0, -1],   // left
-                [1, -1],   // bottom-left
-                [1, 0],    // bottom
-                [1, 1],    // bottom-right
-                [0, 1],    // right
-                [-1, 1]    // top-right
-            ];
-            for (const [dy, dx] of directions) {
-                const nx = x + dx;
-                const ny = y + dy;
-                if (nx >= 0 && nx < MAP_SIZE && ny >= 0 && ny < MAP_SIZE) {
-                    neighbors.push(game.grid[ny][nx]);
-                }
-            }
-            return neighbors;
-        }
-
-        function hasMineIn3x3(cell) {
-            if (cell.hasMine && !cell.mineDeactivated) return true;
-            for (const n of getClockwiseNeighbors(cell.x, cell.y)) {
-                if (n.hasMine && !n.mineDeactivated) return true;
-            }
-            return false;
-        }
-
-        function propagateFromCell(startCell, options = {}) {
-            const ignoreAlreadySafe = options.ignoreAlreadySafe || false;
-            const continueOnMine = options.continueOnMine || false;
-            const markInitialSearch = options.markInitialSearch || false;
-            
-            const checked = new Set();
-            const safeQueue = [startCell];
-            checked.add(`${startCell.x},${startCell.y}`);
-            startCell.isSafe = true;
-            startCell.isDiscovered = true;
-
-            while (safeQueue.length) {
-                const cell = safeQueue.shift();
-                
-                const neighbors = getClockwiseNeighbors(cell.x, cell.y);
-                let foundUnsafeFromThisCell = false;
-                
-                for (const neighbor of neighbors) {
-                    const key = `${neighbor.x},${neighbor.y}`;
-                    if (checked.has(key)) continue;
-                    if (ignoreAlreadySafe && neighbor.isSafe) continue;
-                    
-                    checked.add(key);
-                    
-                    const hasMine = hasMineIn3x3(neighbor);
-                    
-                    if (!hasMine) {
-                        neighbor.isSafe = true;
-                        neighbor.isDiscovered = true;
-                        safeQueue.push(neighbor);
-                    } else {
-                        neighbor.isDiscovered = true;
-                        if (markInitialSearch) {
-                            neighbor.foundByInitialSearch = true;
-                        }
-                        foundUnsafeFromThisCell = true;
-                    }
-                }
-                
-                if (!continueOnMine && foundUnsafeFromThisCell) {
-                    return;
-                }
-            }
-        }
-
-        function updateDiscovered() {
         }
 
         function updateVisibility() {
@@ -655,6 +484,7 @@
 
             game.playerX = newX;
             game.playerY = newY;
+            game.grid[newY][newX].isVisited = true;
             playSound('step');
 
             if (newCell.hasMine && !newCell.mineDeactivated) {
@@ -676,10 +506,7 @@
 
             if (cell.hasMine && !cell.mineDeactivated) {
                 cell.mineDeactivated = true;
-                cell.isSafe = true;
-                cell.isDiscovered = true;
                 game.onMine = false;
-                propagateFromCell(cell, { ignoreAlreadySafe: true });
                 checkWin();
                 playSound('deactivate');
                 renderGrid();
@@ -767,27 +594,14 @@
                         cellDiv.classList.add('player');
                         cellDiv.textContent = '☺';
                     } else if (!inViewArea) {
-                        if (cell.isSafe) {
-                            cellDiv.classList.add('debug-safe');
-                            cellDiv.textContent = 'S';
-                        } else if (cell.foundByInitialSearch) {
-                            cellDiv.classList.add('debug-notsafe');
-                            cellDiv.textContent = 'N';
-                        } else {
-                            cellDiv.classList.add('fog');
-                        }
+                        cellDiv.classList.add('fog-dark');
                     } else if (cell.mineDeactivated) {
                         cellDiv.classList.add('deactivated');
                         cellDiv.textContent = '✓';
-                    } else if (cell.foundByInitialSearch) {
-                        cellDiv.classList.add('debug-notsafe');
-                        cellDiv.textContent = 'N';
-                    } else if (cell.isDiscovered) {
-                        cellDiv.classList.add('discovered');
-                        cellDiv.textContent = ' ';
-                    } else if (cell.hasMine && !cell.mineDeactivated) {
-                        cellDiv.classList.add('fog');
-                    } else if (cell.isSafe) {
+                    } else if (cell.hasMine && !cell.mineDeactivated && cell.isVisited) {
+                        cellDiv.classList.add('revealed-mine');
+                        cellDiv.textContent = '✸';
+                    } else if (cell.isVisited) {
                         cellDiv.classList.add('discovered');
                         cellDiv.textContent = ' ';
                     } else {
