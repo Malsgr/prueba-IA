@@ -62,7 +62,7 @@
         }
 
         #difficulty-panel h2 {
-            color: #00d4ff;
+            color: #ffffff;
             font-size: 1.5rem;
             margin-bottom: 30px;
             letter-spacing: 3px;
@@ -76,8 +76,8 @@
 
         .difficulty-buttons button {
             background: transparent;
-            color: #00d4ff;
-            border: 2px solid #00d4ff;
+            color: #ff4800;
+            border: 2px solid #ff4800;
             padding: 15px 30px;
             font-size: 1rem;
             cursor: pointer;
@@ -810,14 +810,14 @@
                     if (isPlayer) {
                         cellDiv.classList.add('player');
                         cellDiv.textContent = '☺';
-                    } else if (!inViewArea) {
-                        cellDiv.classList.add('fog-dark');
                     } else if (cell.mineDeactivated) {
                         cellDiv.classList.add('deactivated');
                         cellDiv.textContent = '✓';
                     } else if (cell.hasMine && !cell.mineDeactivated && cell.isVisited) {
                         cellDiv.classList.add('revealed-mine');
                         cellDiv.textContent = '✸';
+                    } else if (!inViewArea) {
+                        cellDiv.classList.add('fog-dark');
                     } else if (cell.isVisited) {
                         cellDiv.classList.add('discovered');
                         cellDiv.textContent = ' ';
