@@ -453,11 +453,11 @@
                     MINE_PROBABILITY = 0.08 * 0.8;
                     break;
                 case 'hard':
-                    MAP_SIZE = Math.floor(33 * 1.2);
+                    MAP_SIZE = 33;
                     MINE_PROBABILITY = 0.08 * 1.5;
                     break;
                 case 'blackout':
-                    MAP_SIZE = Math.floor(33 * 1.5);
+                    MAP_SIZE = 33;
                     MINE_PROBABILITY = 0.08;
                     isBlackout = true;
                     break;
@@ -610,11 +610,14 @@
             }
 
             countAdjacentMines() {
-                return this.getNeighbors().filter(n => n.hasMine && !n.mineDeactivated).length;
+                const neighborMines = this.getNeighbors().filter(n => n.hasMine && !n.mineDeactivated).length;
+                const currentMine = this.hasMine && !this.mineDeactivated ? 1 : 0;
+                return neighborMines + currentMine;
             }
         }
 
         function initGame() {
+            const wasBlackout = game.isBlackout;
             game = {
                 grid: [],
                 playerX: CENTER,
@@ -623,7 +626,8 @@
                 gameOver: false,
                 won: false,
                 soundEnabled: game.soundEnabled,
-                onMine: false
+                onMine: false,
+                isBlackout: wasBlackout
             };
 
             for (let y = 0; y < MAP_SIZE; y++) {
@@ -855,7 +859,9 @@
         }
 
         function restartGame() {
-            initGame();
+            document.getElementById('difficulty-panel').style.display = 'block';
+            document.querySelector('.game-wrapper').style.display = 'none';
+            document.getElementById('message').classList.remove('show');
         }
 
         document.addEventListener('keydown', (e) => {
