@@ -55,6 +55,10 @@
 
         .game-center {
             order: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
         }
 
         #difficulty-panel {
@@ -130,89 +134,6 @@
 
         .game-wrapper.blackout-mode .game-stats span {
             color: #ff0040 !important;
-        }
-
-        .game-wrapper.blackout-mode .cell.player {
-            background: #000 !important;
-            color: #000 !important;
-            box-shadow: none !important;
-        }
-
-        .game-center {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            position: relative;
-        }
-
-        .game-stats {
-            display: flex;
-            gap: 40px;
-            margin-top: 15px;
-            align-items: center;
-        }
-
-        .info-panel {
-            margin-bottom: 10px;
-        }
-
-        .mines-info {
-            color: #888;
-            font-size: 0.9rem;
-        }
-
-        .game-stats .stat {
-            display: flex;
-            align-items: center;
-        }
-
-        .controls {
-            display: none;
-        }
-
-        .game-layout {
-            display: flex;
-            gap: 60px;
-            align-items: flex-start;
-            justify-content: center;
-        }
-
-        .controls-panel {
-            text-align: right;
-            padding-top: 70px;
-        }
-
-        .controls-title {
-            color: #00d4ff;
-            font-size: 1rem;
-            margin-bottom: 15px;
-            letter-spacing: 2px;
-        }
-
-        .control-item {
-            margin-bottom: 12px;
-            color: #888;
-            font-size: 0.9rem;
-        }
-
-        .game-center {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .info-panel {
-            margin-bottom: 10px;
-        }
-
-        .mines-info {
-            margin-top: 10px;
-            color: #888;
-            font-size: 0.9rem;
-        }
-
-        .controls {
-            display: none;
         }
 
         #game-container {
@@ -431,7 +352,7 @@
     <script>
         let MAP_SIZE = 33;
         let MINE_PROBABILITY = 0.08;
-        let TOTAL_CELLS, TOTAL_MINES, CENTER, VISIBILITY_RADIUS;
+        let TOTAL_MINES, CENTER, VISIBILITY_RADIUS;
 
         let game = {
             grid: [],
@@ -466,8 +387,7 @@
                     MINE_PROBABILITY = 0.03;
             }
             
-            TOTAL_CELLS = MAP_SIZE * MAP_SIZE;
-            TOTAL_MINES = Math.floor((TOTAL_CELLS - 1) * MINE_PROBABILITY);
+            TOTAL_MINES = Math.floor((MAP_SIZE * MAP_SIZE - 1) * MINE_PROBABILITY);
             CENTER = Math.floor(MAP_SIZE / 2);
             VISIBILITY_RADIUS = 5;
             
@@ -752,6 +672,11 @@
             const cell = game.grid[game.playerY][game.playerX];
             const count = cell.countAdjacentMines();
             
+            const radarPanel = document.getElementById('radar-panel');
+            const radarNote = document.getElementById('radar-note');
+            radarNote.textContent = `Minas cercanas: ${count}`;
+            radarPanel.classList.add('show');
+            
             ensureAudioContext();
             
             if (game.soundEnabled) {
@@ -914,8 +839,6 @@
             this.textContent = `SONIDO: ${game.soundEnabled ? 'ON' : 'OFF'}`;
             this.classList.toggle('on', game.soundEnabled);
         });
-
-        initGame();
     </script>
 </body>
 </html>
