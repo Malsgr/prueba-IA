@@ -307,9 +307,36 @@
             border-color: #00ff88;
             color: #00ff88;
         }
+
+        #info-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: #333;
+            color: #00d4ff;
+            border: 2px solid #00d4ff;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 1.2rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        #info-btn:hover {
+            background: #00d4ff;
+            color: #000;
+        }
     </style>
 </head>
 <body>
+    <a id="info-btn" href="https://github.com/Malsgr/hackaton" target="_blank">i</a>
     <button id="sound-toggle" class="on">SONIDO: ON</button>
     
     <h1>MINESWEEPER</h1>
